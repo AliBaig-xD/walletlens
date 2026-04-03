@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../../../config/db.js";
 import { logger } from "../../../utils/logger.js";
-import { analyzeBodySchema } from "../schemas/analyze.schema.js";
+import {
+  analyzeBodySchema,
+  transfersBodySchema,
+} from "../schemas/analyze.schema.js";
 import {
   getAddressEnriched,
   getAddressTransfers,
@@ -92,6 +95,32 @@ export class AnalyzeController {
           ...formattedIntel,
           summary,
           transfers: formattedTransfers,
+          generatedAt: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  transfers = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const { address, timeLast } = transfersBodySchema.parse(req.body);
+
+      logger.info("Transfers request", { address, timeLast });
+
+      const data = await getAddressTransfers(address, timeLast);
+      const formatted = formatTransfers(data);
+
+      res.json({
+        data: {
+          address,
+          timeLast,
+          ...formatted,
           generatedAt: new Date().toISOString(),
         },
       });

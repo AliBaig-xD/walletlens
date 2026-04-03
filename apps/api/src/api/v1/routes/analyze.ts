@@ -3,6 +3,7 @@ import { MonkePayExpress } from "@monkepay/sdk";
 import { AnalyzeController } from "../controllers/analyze.controller.js";
 import { optionalAuthenticate } from "../middleware/auth.js";
 import { env } from "../../../config/env.js";
+import { logger } from "../../../utils/logger.js";
 
 const router = Router();
 const ctrl = new AnalyzeController();
@@ -16,11 +17,14 @@ const monkePay = MonkePayExpress({
     ctrl.handlePayment(payment);
   },
   onError: async (error) => {
-    console.error("[MonkePay]", error.code, error.phase, error.message);
+    logger.error("[MonkePay]", error.code, error.phase, error.message);
   },
 });
 
 // POST /api/v1/analyze — $0.10 per request
 router.post("/analyze", optionalAuthenticate, monkePay({ price: '0.10' }), ctrl.analyze);
+
+// POST /api/v1/transfers — $0.05 per request
+router.post('/transfers', optionalAuthenticate, monkePay({ price: '0.05' }), ctrl.transfers);
 
 export default router;
