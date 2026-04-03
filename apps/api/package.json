@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec \"node --loader ts-node/esm\" src/index.ts",
+    "arkham:check": "node --loader ts-node/esm src/scripts/arkham-check.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "db:generate": "prisma generate",
