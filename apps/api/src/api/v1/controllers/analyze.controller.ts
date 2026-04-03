@@ -8,10 +8,30 @@ import {
   getEntitySummary,
 } from "../services/arkham.service.js";
 import { generateSummary } from "../services/summarize.service.js";
+import type { PaymentEvent } from "@monkepay/sdk";
 import { formatIntel, formatTransfers } from "../../../utils/arkham.util.js";
 import { env } from "../../../config/env.js";
 
 export class AnalyzeController {
+  // Short-lived store for onPayment events
+  // Keyed by agentAddress — populated by MonkePay onPayment callback
+  // Simple and reliable — no header parsing guesswork
+  private recentPayments: PaymentEvent[] = [];
+
+  handlePayment(payment: PaymentEvent): void {
+    this.recentPayments.push(payment);
+    // Clean up payments older than 2 minutes
+    const cutoff = Date.now() - 2 * 60 * 1000;
+    this.recentPayments = this.recentPayments.filter(
+      (p) => new Date(p.timestamp).getTime() > cutoff,
+    );
+  }
+
+  // Get the most recent payment — close enough for hackathon linkage
+  private popRecentPayment(): PaymentEvent | undefined {
+    return this.recentPayments.pop();
+  }
+
   analyze = async (
     req: Request,
     res: Response,
@@ -45,10 +65,15 @@ export class AnalyzeController {
       const formattedIntel = formatIntel(intel);
       const formattedTransfers = formatTransfers(transfers);
 
+      const payment = this.popRecentPayment();
+
       await prisma.report.create({
         data: {
           userId: req.user?.userId ?? null,
-          agentAddress: req.user?.walletAddress?.toLowerCase() ?? null,
+          agentAddress:
+            payment?.agentAddress?.toLowerCase() ??
+            req.user?.walletAddress?.toLowerCase() ??
+            null,
           address: address.toLowerCase(),
           reportType: "analyze",
           summary,
@@ -56,6 +81,8 @@ export class AnalyzeController {
             intel: formattedIntel,
             transfers: formattedTransfers,
           } as any,
+          txHash: payment?.txHash ?? null,
+          amountPaid: payment?.amountUSDC ?? null,
           network: env.NETWORK,
         },
       });
