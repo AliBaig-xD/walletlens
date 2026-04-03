@@ -91,3 +91,94 @@ Mention when attribution is predicted vs verified.`;
 
   return content.text;
 }
+
+export async function generateReportMarkdown(
+  address: string,
+  intel: ArkhamEnrichedResponse,
+  transfers: ArkhamTransfersResponse,
+  entitySummary: ArkhamEntitySummary | null,
+  summary: string,
+): Promise<string> {
+  const riskScore = computeRiskScore(intel);
+  const entity = intel.arkhamEntity ?? intel.predictedEntity;
+  const isPredicted = !intel.arkhamEntity && !!intel.predictedEntity;
+  const tags =
+    intel.populatedTags?.map((t) => cleanTagLabel(t.label)).join(", ") ||
+    "None";
+  const totalUSD = transfers.transfers.reduce((s, t) => s + t.historicalUSD, 0);
+  const now = new Date().toUTCString();
+
+  const riskLabel =
+    riskScore >= 60 ? "🔴 HIGH" : riskScore >= 30 ? "🟡 MEDIUM" : "🟢 LOW";
+
+  return `# WalletLens Intelligence Report
+
+**Generated:** ${now}
+**Powered by:** Arkham Intelligence × Claude AI × WalletLens
+
+---
+
+## Wallet Overview
+
+| Field | Value |
+|-------|-------|
+| Address | \`${address}\` |
+| Chain | ${intel.chain} |
+| Entity | ${entity ? `${entity.name} (${entity.type})${isPredicted ? " *predicted*" : ""}` : "Unknown"} |
+| Label | ${intel.arkhamLabel?.name ?? "None"} |
+| Risk Score | **${riskScore}/100 — ${riskLabel}** |
+| Tags | ${tags} |
+| Contract | ${intel.contract ? "Yes" : "No"} |
+
+${
+  entitySummary
+    ? `## Entity Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total Balance | $${entitySummary.balanceUsd.toLocaleString()} |
+| Total Volume | $${entitySummary.volumeUsd.toLocaleString()} |
+| Addresses | ${entitySummary.numAddresses} |
+| First Transaction | ${entitySummary.firstTx} |
+| Last Transaction | ${entitySummary.lastTx} |
+
+`
+    : ""
+}---
+
+## AI Analysis
+
+${summary}
+
+---
+
+## Recent Activity (Last 24h)
+
+**Transactions:** ${transfers.transfers.length}
+**Volume:** $${totalUSD.toLocaleString()}
+
+### Transfer Log
+
+| Time | From | To | Amount | USD |
+|------|------|----|--------|-----|
+${transfers.transfers
+  .slice(0, 25)
+  .map((t) => {
+    const from =
+      t.fromAddress.arkhamEntity?.name ??
+      t.fromAddress.address.slice(0, 8) + "...";
+    const to =
+      t.toAddress.arkhamEntity?.name ?? t.toAddress.address.slice(0, 8) + "...";
+    return `| ${new Date(t.blockTimestamp).toLocaleString()} | ${from} | ${to} | ${t.unitValue.toFixed(4)} ${t.tokenSymbol} | $${t.historicalUSD.toFixed(2)} |`;
+  })
+  .join("\n")}
+
+---
+
+## Disclaimer
+
+This report uses Arkham's probabilistic attribution. Predicted entities (marked *predicted*) are lower confidence than verified entities. This report is for informational and research purposes only and does not constitute legal advice, investment advice, or admissible evidence. Always corroborate findings independently.
+
+*WalletLens — walletlens.online*
+`;
+}
