@@ -68,7 +68,7 @@ export async function arkhamGet<T>(
 
 // ─── Data processing ───────────────────────────────────────────────────────────
 
-function cleanTagLabel(label: string): string {
+export function cleanTagLabel(label: string): string {
   return label
     .replace(/\{[^}]+\}/g, "")
     .replace(/\s+/g, " ")
