@@ -27,4 +27,12 @@ router.post("/analyze", optionalAuthenticate, monkePay({ price: '0.10' }), ctrl.
 // POST /api/v1/transfers — $0.05 per request
 router.post('/transfers', optionalAuthenticate, monkePay({ price: '0.05' }), ctrl.transfers);
 
+// POST /api/v1/report — $1.00 one_time
+router.post(
+  '/report',
+  optionalAuthenticate,
+  monkePay({ price: '1.00', paymentMode: 'one_time' }),
+  ctrl.report
+);
+
 export default router;

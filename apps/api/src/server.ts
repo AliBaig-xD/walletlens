@@ -8,6 +8,7 @@ import { env } from "./config/env.js";
 import { logger, loggerStream } from "./utils/logger.js";
 import { disconnectDatabase } from "./config/db.js";
 import { disconnectRedis } from "./config/redis.js";
+import apiV1Routes from "./api/v1/routes/index.js";
 import { errorHandler } from "./api/v1/middleware/errors.js";
 import { publicRateLimiter } from "./api/v1/middleware/rateLimit.js";
 
@@ -58,6 +59,8 @@ app.get("/health", (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use("/api/v1", apiV1Routes);
 
 // 404
 app.use((req: Request, res: Response) => {

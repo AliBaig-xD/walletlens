@@ -4,13 +4,17 @@ import { logger } from "../../../utils/logger.js";
 import {
   analyzeBodySchema,
   transfersBodySchema,
+  reportBodySchema,
 } from "../schemas/analyze.schema.js";
 import {
   getAddressEnriched,
   getAddressTransfers,
   getEntitySummary,
 } from "../services/arkham.service.js";
-import { generateSummary } from "../services/summarize.service.js";
+import {
+  generateSummary,
+  generateReportMarkdown,
+} from "../services/summarize.service.js";
 import type { PaymentEvent } from "@monkepay/sdk";
 import { formatIntel, formatTransfers } from "../../../utils/arkham.util.js";
 import { env } from "../../../config/env.js";
@@ -121,6 +125,76 @@ export class AnalyzeController {
           address,
           timeLast,
           ...formatted,
+          generatedAt: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  report = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const { address } = reportBodySchema.parse(req.body);
+
+      logger.info("Report request", {
+        address,
+        userId: req.user?.userId ?? "anon",
+      });
+
+      const [intel, transfers] = await Promise.all([
+        getAddressEnriched(address),
+        getAddressTransfers(address, "24h"),
+      ]);
+
+      const entityId = intel.arkhamEntity?.id ?? null;
+      const entitySummary = entityId ? await getEntitySummary(entityId) : null;
+
+      const summary = await generateSummary(
+        address,
+        intel,
+        transfers,
+        entitySummary,
+      );
+      const markdown = await generateReportMarkdown(
+        address,
+        intel,
+        transfers,
+        entitySummary,
+        summary,
+      );
+
+      const formattedIntel = formatIntel(intel);
+      const payment = this.popRecentPayment();
+
+      const report = await prisma.report.create({
+        data: {
+          userId: req.user?.userId ?? null,
+          agentAddress:
+            payment?.agentAddress?.toLowerCase() ??
+            req.user?.walletAddress?.toLowerCase() ??
+            null,
+          address: address.toLowerCase(),
+          reportType: "report",
+          summary,
+          result: { intel: formattedIntel } as any,
+          markdown,
+          txHash: payment?.txHash ?? null,
+          amountPaid: payment?.amountUSDC ?? null,
+          network: env.NETWORK,
+        },
+      });
+
+      res.json({
+        data: {
+          reportId: report.id,
+          ...formattedIntel,
+          summary,
+          reportUrl: `https://walletlens.online/report/${report.id}`,
           generatedAt: new Date().toISOString(),
         },
       });

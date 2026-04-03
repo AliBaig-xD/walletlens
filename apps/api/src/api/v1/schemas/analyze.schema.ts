@@ -19,6 +19,12 @@ export const transfersBodySchema = z.object({
     .default("24h"),
 });
 
+export const reportBodySchema = z.object({
+  address: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{40}$/, "Invalid EVM wallet address"),
+});
+
 // ─── Response schemas ──────────────────────────────────────────────────────────
 
 const entitySchema = z
@@ -78,9 +84,26 @@ export const transfersResponseSchema = z.object({
   }),
 });
 
+export const reportResponseSchema = z.object({
+  data: z.object({
+    reportId: z.number(),
+    address: z.string(),
+    chain: z.string(),
+    entity: entitySchema,
+    label: z.string().nullable(),
+    tags: z.array(tagSchema),
+    riskScore: z.number(),
+    summary: z.string(),
+    reportUrl: z.string(),
+    generatedAt: z.string(),
+  }),
+});
+
 // ─── Inferred types ────────────────────────────────────────────────────────────
 
 export type AnalyzeBody = z.infer<typeof analyzeBodySchema>;
 export type TransfersBody = z.infer<typeof transfersBodySchema>;
+export type ReportBody = z.infer<typeof reportBodySchema>;
 export type AnalyzeResponse = z.infer<typeof analyzeResponseSchema>;
 export type TransfersResponse = z.infer<typeof transfersResponseSchema>;
+export type ReportResponse = z.infer<typeof reportResponseSchema>;
