@@ -1,0 +1,24 @@
+{
+  "name": "walletlens",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:mcp": "npm run dev --workspace=packages/mcp",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:mcp": "npm run build --workspace=packages/mcp",
+    "docker:up": "docker-compose -f apps/api/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f apps/api/docker-compose.yml down"
+  },
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
