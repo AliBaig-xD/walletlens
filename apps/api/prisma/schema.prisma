@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// ─── USER ──────────────────────────────────────────────────────────────────────
+
+model User {
+  id            Int       @id @default(autoincrement())
+  walletAddress String    @unique
+  role          UserRole  @default(USER)
+  isBanned      Boolean   @default(false)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions UserSession[]
+  reports  Report[]
+
+  @@index([walletAddress])
+  @@map("users")
+}
+
+// ─── SESSION ───────────────────────────────────────────────────────────────────
+
+model UserSession {
+  id                    Int       @id @default(autoincrement())
+  userId                Int
+  walletAddress         String
+  sessionToken          String    @unique
+  refreshToken          String?   @unique
+  refreshTokenExpiresAt DateTime?
+  ipAddress             String?
+  userAgent             String?
+  expiresAt             DateTime
+  createdAt             DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([refreshToken])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+// ─── REPORT ────────────────────────────────────────────────────────────────────
+// Created on every paid request to /analyze, /transfers, or /report.
+// userId is null when an agent calls without auth.
+// agentAddress is the paying wallet from MonkePay onPayment callback.
+// On user signup, reports with matching agentAddress are claimed automatically.
+
+model Report {
+  id           Int      @id @default(autoincrement())
+
+  // Auth — who generated it
+  userId       Int?
+  user         User?    @relation(fields: [userId], references: [id])
+  agentAddress String?  // paying wallet — used for claim on signup
+
+  // Query
+  address      String   // the analyzed wallet address
+  reportType   String   // "analyze" | "transfers" | "report"
+
+  // Output
+  summary      String?  // AI-generated summary (all types)
+  result       Json     // full formatted response blob
+  markdown     String?  // full markdown report (report type only)
+
+  // Payment
+  txHash       String?  @unique
+  amountPaid   String?
+  network      String?  @default("base-sepolia")
+
+  createdAt    DateTime @default(now())
+
+  @@index([address])
+  @@index([userId])
+  @@index([agentAddress])
+  @@index([txHash])
+  @@index([createdAt])
+  @@map("reports")
+}
