@@ -94,7 +94,7 @@ export const reportResponseSchema = z.object({
     tags: z.array(tagSchema),
     riskScore: z.number(),
     summary: z.string(),
-    reportUrl: z.string(),
+    markdown: z.string(),
     generatedAt: z.string(),
   }),
 });

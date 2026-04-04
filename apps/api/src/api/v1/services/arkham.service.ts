@@ -18,10 +18,13 @@ export async function getAddressTransfers(
   address: string,
   timeLast = "24h",
 ): Promise<ArkhamTransfersResponse> {
-  return arkhamGet<ArkhamTransfersResponse>(
+  const data = await arkhamGet<ArkhamTransfersResponse>(
     `/transfers?base=${address}&timeLast=${timeLast}&limit=50&sortKey=time&sortDir=desc`,
     `transfers:${address.toLowerCase()}:${timeLast}`,
   );
+  return {
+    transfers: data.transfers ?? [],
+  };
 }
 
 // Optional — called only if arkhamEntity.id is present

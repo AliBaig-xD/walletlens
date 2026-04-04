@@ -146,6 +146,10 @@ export class AnalyzeController {
         },
       });
     } catch (error) {
+      logger.error("Analyze error", {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       next(error);
     }
   };
@@ -277,7 +281,7 @@ export class AnalyzeController {
               reportId: cached.id,
               ...cachedIntel,
               summary: cached.summary,
-              reportUrl: `https://walletlens.online/report/${cached.id}`,
+              markdown: cached.markdown,
               generatedAt: cached.createdAt.toISOString(),
             },
           });
@@ -333,7 +337,7 @@ export class AnalyzeController {
           reportId: report.id,
           ...formattedIntel,
           summary,
-          reportUrl: `https://walletlens.online/report/${report.id}`,
+          markdown,
           generatedAt: new Date().toISOString(),
         },
       });

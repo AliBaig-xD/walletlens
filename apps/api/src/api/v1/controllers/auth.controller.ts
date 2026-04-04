@@ -111,9 +111,7 @@ export class AuthController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      if (!req.user)
-        throw new ApiError(401, "UNAUTHORIZED", "Not authenticated");
-      await this.authService.logout(req.user.sessionId);
+      await this.authService.logout(req.user!.sessionId);
       this.clearCookies(res);
       res.json({ data: { success: true } });
     } catch (error) {
@@ -127,8 +125,6 @@ export class AuthController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      if (!req.user)
-        throw new ApiError(401, "UNAUTHORIZED", "Not authenticated");
       res.json({ data: { user: req.user } });
     } catch (error) {
       next(error);
