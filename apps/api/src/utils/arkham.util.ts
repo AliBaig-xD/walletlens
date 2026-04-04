@@ -36,6 +36,14 @@ async function setCache(key: string, data: unknown): Promise<void> {
   }
 }
 
+export async function isArkhamCached(key: string): Promise<boolean> {
+  try {
+    return (await redis.exists(`arkham:${key}`)) === 1;
+  } catch {
+    return false;
+  }
+}
+
 export async function arkhamGet<T>(
   path: string,
   cacheKey?: string,

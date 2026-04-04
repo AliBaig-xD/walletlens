@@ -16,7 +16,11 @@ import {
   generateReportMarkdown,
 } from "../services/summarize.service.js";
 import type { PaymentEvent } from "@monkepay/sdk";
-import { formatIntel, formatTransfers } from "../../../utils/arkham.util.js";
+import {
+  formatIntel,
+  formatTransfers,
+  isArkhamCached,
+} from "../../../utils/arkham.util.js";
 import { env } from "../../../config/env.js";
 
 export class AnalyzeController {
@@ -46,11 +50,50 @@ export class AnalyzeController {
   ): Promise<void> => {
     try {
       const { address } = analyzeBodySchema.parse(req.body);
+      const addressLower = address.toLowerCase();
+      const reuseSince = new Date(
+        Date.now() - env.ARKHAM_CACHE_TTL_SECONDS * 1000,
+      );
 
       logger.info("Analyze request", {
         address,
         userId: req.user?.userId ?? "anon",
       });
+
+      const [hasEnrichedCache, hasTransfersCache] = await Promise.all([
+        isArkhamCached(`enriched:${addressLower}`),
+        isArkhamCached(`transfers:${addressLower}:24h`),
+      ]);
+
+      if (hasEnrichedCache && hasTransfersCache) {
+        const cached = await prisma.report.findFirst({
+          where: {
+            address: addressLower,
+            reportType: "analyze",
+            summary: { not: null },
+            createdAt: { gte: reuseSince },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
+        const cachedResult = cached?.result as any;
+        const cachedIntel = cachedResult?.intel;
+        const cachedTransfers = cachedResult?.transfers;
+
+        if (cached && cached.summary && cachedIntel && cachedTransfers) {
+          logger.info("Analyze reuse from cache", { address });
+          this.popRecentPayment();
+          res.json({
+            data: {
+              ...cachedIntel,
+              summary: cached.summary,
+              transfers: cachedTransfers,
+              generatedAt: cached.createdAt.toISOString(),
+            },
+          });
+          return;
+        }
+      }
 
       // Fire all three Arkham calls in parallel
       const [intel, transfers] = await Promise.all([
@@ -81,7 +124,7 @@ export class AnalyzeController {
             payment?.agentAddress?.toLowerCase() ??
             req.user?.walletAddress?.toLowerCase() ??
             null,
-          address: address.toLowerCase(),
+          address: addressLower,
           reportType: "analyze",
           summary,
           result: {
@@ -114,11 +157,67 @@ export class AnalyzeController {
   ): Promise<void> => {
     try {
       const { address, timeLast } = transfersBodySchema.parse(req.body);
+      const addressLower = address.toLowerCase();
+      const reuseSince = new Date(
+        Date.now() - env.ARKHAM_CACHE_TTL_SECONDS * 1000,
+      );
 
       logger.info("Transfers request", { address, timeLast });
 
+      const hasTransfersCache = await isArkhamCached(
+        `transfers:${addressLower}:${timeLast}`,
+      );
+
+      if (hasTransfersCache) {
+        const cached = await prisma.report.findFirst({
+          where: {
+            address: addressLower,
+            reportType: "transfers",
+            createdAt: { gte: reuseSince },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
+        const cachedResult = cached?.result as any;
+        const cachedTransfers = cachedResult?.transfers;
+        const cachedTimeLast = cachedResult?.timeLast;
+
+        if (cached && cachedTransfers && cachedTimeLast === timeLast) {
+          logger.info("Transfers reuse from cache", { address, timeLast });
+          this.popRecentPayment();
+          res.json({
+            data: {
+              address,
+              timeLast,
+              ...cachedTransfers,
+              generatedAt: cached.createdAt.toISOString(),
+            },
+          });
+          return;
+        }
+      }
+
       const data = await getAddressTransfers(address, timeLast);
       const formatted = formatTransfers(data);
+
+      const payment = this.popRecentPayment();
+
+      await prisma.report.create({
+        data: {
+          userId: req.user?.userId ?? null,
+          agentAddress:
+            payment?.agentAddress?.toLowerCase() ??
+            req.user?.walletAddress?.toLowerCase() ??
+            null,
+          address: addressLower,
+          reportType: "transfers",
+          summary: null,
+          result: { transfers: formatted, timeLast } as any,
+          txHash: payment?.txHash ?? null,
+          amountPaid: payment?.amountUSDC ?? null,
+          network: env.NETWORK,
+        },
+      });
 
       res.json({
         data: {
@@ -140,11 +239,51 @@ export class AnalyzeController {
   ): Promise<void> => {
     try {
       const { address } = reportBodySchema.parse(req.body);
+      const addressLower = address.toLowerCase();
+      const reuseSince = new Date(
+        Date.now() - env.ARKHAM_CACHE_TTL_SECONDS * 1000,
+      );
 
       logger.info("Report request", {
         address,
         userId: req.user?.userId ?? "anon",
       });
+
+      const [hasEnrichedCache, hasTransfersCache] = await Promise.all([
+        isArkhamCached(`enriched:${addressLower}`),
+        isArkhamCached(`transfers:${addressLower}:24h`),
+      ]);
+
+      if (hasEnrichedCache && hasTransfersCache) {
+        const cached = await prisma.report.findFirst({
+          where: {
+            address: addressLower,
+            reportType: "report",
+            summary: { not: null },
+            markdown: { not: null },
+            createdAt: { gte: reuseSince },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
+        const cachedResult = cached?.result as any;
+        const cachedIntel = cachedResult?.intel;
+
+        if (cached && cached.summary && cached.markdown && cachedIntel) {
+          logger.info("Report reuse from cache", { address });
+          this.popRecentPayment();
+          res.json({
+            data: {
+              reportId: cached.id,
+              ...cachedIntel,
+              summary: cached.summary,
+              reportUrl: `https://walletlens.online/report/${cached.id}`,
+              generatedAt: cached.createdAt.toISOString(),
+            },
+          });
+          return;
+        }
+      }
 
       const [intel, transfers] = await Promise.all([
         getAddressEnriched(address),
@@ -178,7 +317,7 @@ export class AnalyzeController {
             payment?.agentAddress?.toLowerCase() ??
             req.user?.walletAddress?.toLowerCase() ??
             null,
-          address: address.toLowerCase(),
+          address: addressLower,
           reportType: "report",
           summary,
           result: { intel: formattedIntel } as any,
