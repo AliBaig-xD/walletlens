@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useX402Fetch } from "@/lib/x402";
+import { useX402Fetch } from "@/hooks/useX402";
 import { LoadingView } from "@/components/ui/loading-view";
 import { NoWalletView } from "@/components/ui/no-wallet-view";
 import { ErrorView } from "@/components/ui/error-view";

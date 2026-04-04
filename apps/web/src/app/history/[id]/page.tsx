@@ -195,7 +195,7 @@ function TransfersView({
         <p className="font-mono text-sm text-gray-500">{address}</p>
       </div>
 
-      <div className="bg-[#0d1117] border border-[#1e2a38] rounded-xl p-6">
+      <div className="bg-[#0d1117] border border-[#1e2a38] rounded-xl p-6 overflow-scroll">
         <div className="text-xs text-gray-500 mb-4">
           {transfers.length} transfers · last {data.timeLast}
         </div>

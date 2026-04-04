@@ -19,8 +19,7 @@ export function useX402Fetch() {
 
   return useMemo(() => {
     if (!walletClient) return null;
-    const maxPayment =
-      process.env.NEXT_PUBLIC_X402_MAX_PAYMENT_USDC ?? "10";
+    const maxPayment = process.env.NEXT_PUBLIC_X402_MAX_PAYMENT_USDC ?? "10";
     return wrapFetchWithPayment(
       fetch,
       walletClient as any,

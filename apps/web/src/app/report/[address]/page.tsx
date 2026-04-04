@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useX402Fetch } from "@/lib/x402";
+import { useX402Fetch } from "@/hooks/useX402";
 import { LoadingView } from "@/components/ui/loading-view";
 import { NoWalletView } from "@/components/ui/no-wallet-view";
 import { ErrorView } from "@/components/ui/error-view";
