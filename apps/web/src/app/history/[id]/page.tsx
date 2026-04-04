@@ -11,6 +11,7 @@ import type {
   TransfersData,
   Transfer,
 } from "@/lib/api/types";
+import { TransfersTable } from "@/components/ui/transfer-table";
 
 export default function HistoryPage() {
   const { id } = useParams() as { id: string };
@@ -184,55 +185,7 @@ function TransfersView({
   address: string;
 }) {
   const transfers = data.transfers?.transfers ?? [];
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-4xl font-black mb-2">Transfer History</h1>
-        <p className="font-mono text-sm text-gray-500">{address}</p>
-      </div>
-
-      <div className="bg-[#0d1117] border border-[#1e2a38] rounded-xl p-6 overflow-scroll">
-        <div className="text-xs text-gray-500 mb-4">
-          {transfers.length} transfers · last {data.timeLast}
-        </div>
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="text-gray-500 border-b border-[#1e2a38]">
-              <th className="text-left py-2 pr-4">Time</th>
-              <th className="text-left py-2 pr-4">From</th>
-              <th className="text-left py-2 pr-4">To</th>
-              <th className="text-right py-2">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transfers.map((t: Transfer, i: number) => (
-              <tr
-                key={t.txHash ?? i}
-                className="border-b border-[#0f161f] hover:bg-[#0f161f]"
-              >
-                <td className="py-2 pr-4 text-gray-500">
-                  {new Date(t.timestamp).toLocaleString()}
-                </td>
-                <td className="py-2 pr-4">
-                  {t.fromEntity ?? t.from.slice(0, 8) + "..."}
-                </td>
-                <td className="py-2 pr-4">
-                  {t.toEntity ?? t.to.slice(0, 8) + "..."}
-                </td>
-                <td className="py-2 text-right">
-                  {t.amount.toFixed(4)} {t.token}
-                  <span className="text-gray-500 ml-1">
-                    (${t.amountUSD.toFixed(2)})
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  return <TransfersTable transfers={transfers} address={address} />;
 }
 
 function ReportView({ markdown }: { markdown: string }) {
