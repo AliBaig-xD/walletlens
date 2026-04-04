@@ -9,8 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.1.2",
     "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-slot": "^1.1.2",
     "@rainbow-me/rainbowkit": "^2.1.0",
     "@rainbow-me/rainbowkit-siwe-next-auth": "^0.5.0",
     "@tanstack/react-query": "^5.56.0",
@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "ethers": "^6.16.0",
+    "force-graph": "^1.51.2",
     "framer-motion": "^11.5.0",
     "lucide-react": "^0.447.0",
     "motion": "^12.23.26",
@@ -28,6 +29,7 @@
     "ox": "^0.14.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-force-graph-2d": "^1.29.1",
     "react-hook-form": "^7.68.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
@@ -43,8 +45,8 @@
     "zustand": "^4.5.7"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query-devtools": "^5.91.1",
     "@types/node": "^20",
     "@types/react": "^19",
