@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { type ActionID, ACTIONS } from "@/lib/constants";
+import { type ActionID } from "@/types/pages";
+import { ACTIONS } from "@/lib/constants";
 
 export default function Home() {
   const router = useRouter();
