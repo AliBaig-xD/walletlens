@@ -12,6 +12,7 @@
     "dev:mcp": "npm run dev --workspace=packages/mcp",
     "build:api": "npm run build --workspace=apps/api",
     "build:mcp": "npm run build --workspace=packages/mcp",
+    "start:api": "npm run start --workspace=apps/api",
     "docker:up": "docker-compose -f apps/api/docker-compose.yml up -d",
     "docker:down": "docker-compose -f apps/api/docker-compose.yml down"
   },
