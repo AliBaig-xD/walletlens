@@ -11,8 +11,10 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:mcp": "npm run dev --workspace=packages/mcp",
     "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
     "build:mcp": "npm run build --workspace=packages/mcp",
     "start:api": "npm run start --workspace=apps/api",
+    "start:web": "npm run start --workspace=apps/web",
     "docker:up": "docker-compose -f apps/api/docker-compose.yml up -d",
     "docker:down": "docker-compose -f apps/api/docker-compose.yml down"
   },
