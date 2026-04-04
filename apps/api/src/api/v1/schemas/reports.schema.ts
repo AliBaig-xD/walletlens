@@ -44,4 +44,5 @@ export const reportsListResponseSchema = z.object({
 
 export type ReportParam = z.infer<typeof reportParamSchema>;
 export type ReportsQuery = z.infer<typeof reportsQuerySchema>;
+export type ReportListItem = z.infer<typeof reportItemSchema>;
 export type ReportsListResponse = z.infer<typeof reportsListResponseSchema>;

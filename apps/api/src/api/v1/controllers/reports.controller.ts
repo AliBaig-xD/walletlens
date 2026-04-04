@@ -9,6 +9,7 @@ import {
 import {
   reportParamSchema,
   reportsQuerySchema,
+  type ReportListItem,
 } from "../schemas/reports.schema.js";
 
 export class ReportsController {
@@ -43,7 +44,7 @@ export class ReportsController {
         }),
       ]);
 
-      const serialized = reports.map((r) => ({
+        const serialized: ReportListItem[] = reports.map((r) => ({
         ...r,
         createdAt: r.createdAt.toISOString(),
       }));
