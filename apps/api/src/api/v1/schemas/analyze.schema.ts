@@ -16,7 +16,7 @@ export const transfersBodySchema = z.object({
     .string()
     .regex(/^\d+[hd]$/)
     .optional()
-    .default("24h"),
+    .default("30d"),
 });
 
 export const reportBodySchema = z.object({

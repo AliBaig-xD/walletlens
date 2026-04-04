@@ -3,6 +3,7 @@ import { redis } from "../config/redis.js";
 import { logger } from "./logger.js";
 import {
   ArkhamEnrichedResponse,
+  ArkhamTag,
   ArkhamTransfersResponse,
 } from "../types/arkham.js";
 
@@ -76,11 +77,34 @@ export async function arkhamGet<T>(
 
 // ─── Data processing ───────────────────────────────────────────────────────────
 
-export function cleanTagLabel(label: string): string {
+const SKIP_TAG_PREFIXES = [
+  "signer:",
+  "prev. signer",
+  "signer of gnosis",
+  "prev. signer of gnosis",
+  "owner",
+  "prev. owner",
+  "manager",
+  "prev. manager",
+];
+
+function cleanTagLabel(label: string): string {
   return label
     .replace(/\{[^}]+\}/g, "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+export function filterMeaningfulTags(tags: ArkhamTag[]): string {
+  const meaningful = tags
+    .filter((t) => {
+      const label = cleanTagLabel(t.label).toLowerCase();
+      return !SKIP_TAG_PREFIXES.some((prefix) => label.startsWith(prefix));
+    })
+    .slice(0, 8) // max 8 tags
+    .map((t) => cleanTagLabel(t.label));
+
+  return meaningful.length > 0 ? meaningful.join(", ") : "None";
 }
 
 // ─── Risk score ────────────────────────────────────────────────────────────────

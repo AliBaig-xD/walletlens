@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { env } from "../../../config/env.js";
 import { logger } from "../../../utils/logger.js";
-import { cleanTagLabel, computeRiskScore } from "../../../utils/arkham.util.js";
+import { computeRiskScore, filterMeaningfulTags } from "../../../utils/arkham.util.js";
 import {
   ArkhamEnrichedResponse,
   ArkhamEntitySummary,
@@ -19,9 +19,7 @@ export async function generateSummary(
   const riskScore = computeRiskScore(intel);
   const entity = intel.arkhamEntity ?? intel.predictedEntity;
   const isPredicted = !intel.arkhamEntity && !!intel.predictedEntity;
-  const tags =
-    intel.populatedTags?.map((t) => cleanTagLabel(t.label)).join(", ") ||
-    "None";
+  const tags = filterMeaningfulTags(intel.populatedTags ?? [])
   const totalUSD = transfers.transfers.reduce((s, t) => s + t.historicalUSD, 0);
 
   const entityContext = entity
@@ -55,7 +53,7 @@ TAGS: ${tags}
 RISK SCORE: ${riskScore}/100
 ${entityStats}
 
-RECENT ACTIVITY (24h):
+RECENT ACTIVITY (30d):
 Transactions: ${transfers.transfers.length}
 Volume: $${totalUSD.toLocaleString()}
 ${recentLines || "  No recent transfers"}
@@ -102,9 +100,7 @@ export async function generateReportMarkdown(
   const riskScore = computeRiskScore(intel);
   const entity = intel.arkhamEntity ?? intel.predictedEntity;
   const isPredicted = !intel.arkhamEntity && !!intel.predictedEntity;
-  const tags =
-    intel.populatedTags?.map((t) => cleanTagLabel(t.label)).join(", ") ||
-    "None";
+  const tags = filterMeaningfulTags(intel.populatedTags ?? [])
   const totalUSD = transfers.transfers.reduce((s, t) => s + t.historicalUSD, 0);
   const now = new Date().toUTCString();
 
@@ -152,7 +148,7 @@ ${summary}
 
 ---
 
-## Recent Activity (Last 24h)
+## Recent Activity (Last 30d)
 
 **Transactions:** ${transfers.transfers.length}
 **Volume:** $${totalUSD.toLocaleString()}

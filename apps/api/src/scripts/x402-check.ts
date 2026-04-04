@@ -246,7 +246,7 @@ async function main() {
   );
   const network = (process.env.NETWORK ?? "base-sepolia") as Network;
   const maxPaymentUsdc = process.env.X402_MAX_PAYMENT_USDC ?? "10";
-  const timeLast = process.env.TIME_LAST ?? "24h";
+  const timeLast = process.env.TIME_LAST ?? "30d";
 
   if (network !== "base" && network !== "base-sepolia") {
     throw new Error('NETWORK must be "base" or "base-sepolia".');

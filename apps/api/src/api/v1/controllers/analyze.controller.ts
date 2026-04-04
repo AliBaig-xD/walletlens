@@ -62,7 +62,7 @@ export class AnalyzeController {
 
       const [hasEnrichedCache, hasTransfersCache] = await Promise.all([
         isArkhamCached(`enriched:${addressLower}`),
-        isArkhamCached(`transfers:${addressLower}:24h`),
+        isArkhamCached(`transfers:${addressLower}:30d`),
       ]);
 
       if (hasEnrichedCache && hasTransfersCache) {
@@ -98,7 +98,7 @@ export class AnalyzeController {
       // Fire all three Arkham calls in parallel
       const [intel, transfers] = await Promise.all([
         getAddressEnriched(address),
-        getAddressTransfers(address, "7d"),
+        getAddressTransfers(address, "30d"),
       ]);
 
       // If we have a known entity, get its summary in parallel with Claude
@@ -255,7 +255,7 @@ export class AnalyzeController {
 
       const [hasEnrichedCache, hasTransfersCache] = await Promise.all([
         isArkhamCached(`enriched:${addressLower}`),
-        isArkhamCached(`transfers:${addressLower}:24h`),
+        isArkhamCached(`transfers:${addressLower}:30d`),
       ]);
 
       if (hasEnrichedCache && hasTransfersCache) {

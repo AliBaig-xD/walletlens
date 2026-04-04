@@ -16,7 +16,7 @@ export async function getAddressEnriched(
 
 export async function getAddressTransfers(
   address: string,
-  timeLast = "24h",
+  timeLast = "30d",
 ): Promise<ArkhamTransfersResponse> {
   const data = await arkhamGet<ArkhamTransfersResponse>(
     `/transfers?base=${address}&timeLast=${timeLast}&limit=50&sortKey=time&sortDir=desc`,
