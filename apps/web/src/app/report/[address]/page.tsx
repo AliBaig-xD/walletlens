@@ -1,56 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useX402Fetch } from "@/hooks/useX402";
 import { LoadingView } from "@/components/ui/loading-view";
 import { NoWalletView } from "@/components/ui/no-wallet-view";
 import { ErrorView } from "@/components/ui/error-view";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import type { ReportData } from "@/lib/api/types";
-
-type PageState =
-  | { status: "loading" }
-  | { status: "no-wallet" }
-  | { status: "done"; data: ReportData }
-  | { status: "error"; message: string };
+import { useGatedFetch } from "@/hooks/useGatedFetch";
 
 export default function ReportPage() {
   const { address } = useParams() as { address: string };
-  const x402Fetch = useX402Fetch();
-  const [state, setState] = useState<PageState>({ status: "loading" });
 
-  useEffect(() => {
-    if (!x402Fetch) {
-      setState({ status: "no-wallet" });
-      return;
-    }
-
-    const run = async () => {
-      try {
-        const res = await x402Fetch(ENDPOINTS.analyze.report, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address }),
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (!res.ok)
-          throw new Error(data?.error?.message ?? `HTTP ${res.status}`);
-        setState({ status: "done", data: data.data });
-      } catch (err) {
-        setState({
-          status: "error",
-          message: err instanceof Error ? err.message : "Failed",
-        });
-      }
-    };
-
-    void run();
-  }, [x402Fetch, address]);
+  const state = useGatedFetch<ReportData>({
+    url: ENDPOINTS.analyze.report,
+    body: { address },
+  });
 
   if (state.status === "loading")
     return <LoadingView message="Generating report... $1.00 USDC" />;

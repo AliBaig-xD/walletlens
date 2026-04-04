@@ -1,54 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useX402Fetch } from "@/hooks/useX402";
 import { LoadingView } from "@/components/ui/loading-view";
 import { NoWalletView } from "@/components/ui/no-wallet-view";
 import { ErrorView } from "@/components/ui/error-view";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import type { TransfersData, Transfer } from "@/lib/api/types";
+import { useGatedFetch } from "@/hooks/useGatedFetch";
 
-type PageState =
-  | { status: "loading" }
-  | { status: "no-wallet" }
-  | { status: "done"; data: TransfersData }
-  | { status: "error"; message: string };
 
 export default function TransfersPage() {
   const { address } = useParams() as { address: string };
-  const x402Fetch = useX402Fetch();
-  const [state, setState] = useState<PageState>({ status: "loading" });
-
-  useEffect(() => {
-    if (!x402Fetch) {
-      setState({ status: "no-wallet" });
-      return;
-    }
-
-    const run = async () => {
-      try {
-        const res = await x402Fetch(ENDPOINTS.analyze.transfers, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address, timeLast: "30d" }),
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (!res.ok)
-          throw new Error(data?.error?.message ?? `HTTP ${res.status}`);
-        setState({ status: "done", data: data.data });
-      } catch (err) {
-        setState({
-          status: "error",
-          message: err instanceof Error ? err.message : "Failed",
-        });
-      }
-    };
-
-    void run();
-  }, [x402Fetch, address]);
+  
+  const state = useGatedFetch<TransfersData>({
+    url: ENDPOINTS.analyze.transfers,
+    body: { address, timeLast: "30d" },
+  });
 
   if (state.status === "loading")
     return <LoadingView message="Fetching transfers... $0.05 USDC" />;

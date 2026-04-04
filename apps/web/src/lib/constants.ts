@@ -12,7 +12,7 @@ export const ACTIONS: ACTION[] = [
     id: "transfers",
     label: "Transfers",
     price: "$0.05",
-    description: "Last 24h transfer flows and counterparties",
+    description: "Last 30d transfer flows and counterparties",
     path: (address: string) => `/transfers/${address}`,
   },
   {
