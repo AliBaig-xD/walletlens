@@ -23,3 +23,18 @@ export const ACTIONS: ACTION[] = [
     path: (address: string) => `/report/${address}`,
   },
 ];
+
+export const TYPE_CONFIG: Record<string, { label: string; color: string }> = {
+  analyze: {
+    label: "Analysis",
+    color: "text-blue-400 bg-blue-900/20 border-blue-800/30",
+  },
+  transfers: {
+    label: "Transfers",
+    color: "text-yellow-400 bg-yellow-900/20 border-yellow-800/30",
+  },
+  report: {
+    label: "Full Report",
+    color: "text-[#00d4aa] bg-[#00d4aa]/10 border-[#00d4aa]/20",
+  },
+};

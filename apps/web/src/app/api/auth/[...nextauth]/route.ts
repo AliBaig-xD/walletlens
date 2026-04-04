@@ -3,8 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { cookies } from "next/headers";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 type CookieOptions = {
   domain?: string;
   path?: string;
@@ -67,7 +65,7 @@ const authOptions: NextAuthOptions = {
           }
           const address = addressMatch[0];
 
-          const response = await fetch(`${API_URL}${ENDPOINTS.auth.verify}`, {
+          const response = await fetch(ENDPOINTS.auth.verify, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",

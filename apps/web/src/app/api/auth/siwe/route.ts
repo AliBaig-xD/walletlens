@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 export async function GET(req: NextRequest) {
   try {
     const address = req.nextUrl.searchParams.get("address");
@@ -13,7 +11,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const response = await fetch(`${API_URL}${ENDPOINTS.auth.nonce(address)}`);
+    const response = await fetch(ENDPOINTS.auth.nonce(address));
     if (!response.ok) {
       throw new Error(`Backend returned ${response.status}`);
     }
