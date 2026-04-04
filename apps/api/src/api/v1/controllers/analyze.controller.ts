@@ -98,7 +98,7 @@ export class AnalyzeController {
       // Fire all three Arkham calls in parallel
       const [intel, transfers] = await Promise.all([
         getAddressEnriched(address),
-        getAddressTransfers(address, "24h"),
+        getAddressTransfers(address, "7d"),
       ]);
 
       // If we have a known entity, get its summary in parallel with Claude
@@ -291,7 +291,7 @@ export class AnalyzeController {
 
       const [intel, transfers] = await Promise.all([
         getAddressEnriched(address),
-        getAddressTransfers(address, "24h"),
+        getAddressTransfers(address, "30d"),
       ]);
 
       const entityId = intel.arkhamEntity?.id ?? null;
