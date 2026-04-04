@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { cn } from "@/utils";
+import Image from "next/image";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -17,11 +18,11 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/70 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 bg-surface/60 backdrop-blur-md">
         <div className="flex items-center gap-8">
-          <Link
-            href="/"
-            className="text-lg font-black tracking-tight text-on-surface"
-          >
-            Wallet<span className="text-[#00d4aa]">Lens</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="WalletLens" width={32} height={32} />
+            <span className="text-lg font-black tracking-tight text-on-surface">
+              Wallet<span className="text-[#00d4aa]">Lens</span>
+            </span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => {
