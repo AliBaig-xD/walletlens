@@ -12,6 +12,17 @@ import {
   type ReportListItem,
 } from "../schemas/reports.schema.js";
 
+type ReportRow = {
+  id: number;
+  address: string;
+  reportType: string;
+  summary: string | null;
+  txHash: string | null;
+  amountPaid: string | null;
+  network: string | null;
+  createdAt: Date;
+};
+
 export class ReportsController {
   // GET /api/v1/reports — paginated list for authenticated user
   list = async (
@@ -44,10 +55,12 @@ export class ReportsController {
         }),
       ]);
 
-        const serialized: ReportListItem[] = reports.map((r) => ({
-        ...r,
-        createdAt: r.createdAt.toISOString(),
-      }));
+      const serialized: ReportListItem[] = reports.map(
+        (r: ReportRow) => ({
+          ...r,
+          createdAt: r.createdAt.toISOString(),
+        }),
+      );
 
       const response = buildPaginatedResponse(serialized, page, limit, total);
       res.json(response);
