@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import Markdown from "@/components/ui/markdown";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import type {
   StoredReport,
@@ -156,7 +155,7 @@ function AnalyzeView({
         <div className="flex flex-wrap gap-2">
           {intel.tags.slice(0, 8).map((tag) => (
             <span
-              key={tag.id}
+              key={tag.id + tag.label}
               className="px-3 py-1 bg-[#0d1117] border border-[#1e2a38] rounded-full text-xs text-gray-400"
             >
               {tag.label}
@@ -170,9 +169,7 @@ function AnalyzeView({
           <h2 className="text-xs font-bold text-[#00d4aa] uppercase tracking-widest mb-4">
             AI Analysis
           </h2>
-          <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
-            {summary}
-          </p>
+          <Markdown>{summary}</Markdown>
         </div>
       )}
     </div>
@@ -243,27 +240,7 @@ function ReportView({ markdown }: { markdown: string }) {
     <div className="bg-[#0d1117] border border-[#1e2a38] rounded-2xl overflow-hidden">
       <div className="h-1 bg-linear-to-r from-[#00d4aa] to-[#00b894]" />
       <div className="p-8 md:p-12">
-        <div
-          className="prose prose-invert prose-sm max-w-none
-          prose-headings:font-bold
-          prose-h1:text-xl prose-h1:text-[#00d4aa] prose-h1:border-b prose-h1:border-[#1e2a38] prose-h1:pb-3 prose-h1:mb-6
-          prose-h2:text-base prose-h2:text-white prose-h2:mt-8 prose-h2:mb-4
-          prose-p:text-gray-300 prose-p:leading-relaxed prose-p:my-3
-          prose-strong:text-white prose-strong:font-semibold
-          prose-code:text-[#00d4aa] prose-code:bg-[#080b10] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:before:content-none prose-code:after:content-none
-          prose-table:w-full prose-table:border-collapse prose-table:my-4
-          prose-thead:bg-[#080b10]
-          prose-th:border prose-th:border-[#1e2a38] prose-th:p-3 prose-th:text-left prose-th:text-xs prose-th:font-bold prose-th:text-gray-400 prose-th:uppercase prose-th:tracking-wider
-          prose-td:border prose-td:border-[#1e2a38] prose-td:p-3 prose-td:text-xs prose-td:text-gray-300
-          prose-tr:border-b prose-tr:border-[#1e2a38] even:prose-tr:bg-[#080b10]
-          prose-hr:border-[#1e2a38] prose-hr:my-8
-          prose-li:text-gray-300 prose-li:my-1
-          prose-ul:my-3 prose-ol:my-3
-          prose-blockquote:border-l-[#00d4aa] prose-blockquote:text-gray-400 prose-blockquote:not-italic
-          prose-a:text-[#00d4aa] prose-a:no-underline hover:prose-a:underline"
-        >
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
-        </div>
+        <Markdown>{markdown}</Markdown>
       </div>
     </div>
   );

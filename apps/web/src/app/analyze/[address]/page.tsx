@@ -9,6 +9,7 @@ import { LoadingView } from "@/components/ui/loading-view";
 import { NoWalletView } from "@/components/ui/no-wallet-view";
 import { ErrorView } from "@/components/ui/error-view";
 import { AnalyzeData, Transfer } from "@/lib/api/types";
+import Markdown from "@/components/ui/markdown";
 
 type PageState =
   | { status: "loading" }
@@ -17,7 +18,6 @@ type PageState =
   | { status: "error"; message: string };
 
 type Tag = { id: string; label: string };
-
 
 export default function AnalyzePage() {
   const { address } = useParams() as { address: string };
@@ -143,7 +143,7 @@ export default function AnalyzePage() {
           <div className="flex flex-wrap gap-2 mb-8">
             {result.tags.slice(0, 8).map((tag: Tag) => (
               <span
-                key={tag.id}
+                key={tag.id + tag.label}
                 className="px-3 py-1 bg-[#0d1117] border border-[#1e2a38] rounded-full text-xs text-gray-400"
               >
                 {tag.label}
@@ -157,9 +157,7 @@ export default function AnalyzePage() {
           <h2 className="text-xs font-bold text-[#00d4aa] uppercase tracking-widest mb-4">
             AI Analysis
           </h2>
-          <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
-            {result.summary}
-          </p>
+          <Markdown>{result.summary}</Markdown>
         </div>
 
         {/* Transfers table */}
