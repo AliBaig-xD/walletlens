@@ -1,19 +1,21 @@
 "use client";
 
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { useTheme } from "next-themes";
+import { darkTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { ReactNode, useEffect, useState } from "react";
-import rainbowkitTheme from "@/lib/config/rainbowkit-theme";
 
 export default function RainbowKitThemeProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => setMounted(true), []);
+
+  const theme = darkTheme({
+    accentColor: "#00ffa3",
+    accentColorForeground: "#003920",
+    borderRadius: "medium",
+  });
 
   if (!mounted) {
     return <>{children}</>;
@@ -22,7 +24,7 @@ export default function RainbowKitThemeProvider({
   return (
     <RainbowKitProvider
       coolMode
-      theme={rainbowkitTheme(resolvedTheme)}
+      theme={theme}
       appInfo={{
         appName: "WalletLens",
         disclaimer: undefined,
