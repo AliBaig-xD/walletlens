@@ -17,9 +17,7 @@ export class AuthController {
       secure: env.COOKIE_SECURE,
       sameSite: env.COOKIE_SAME_SITE as any,
       path: "/",
-      ...(env.COOKIE_DOMAIN !== "localhost"
-        ? { domain: env.COOKIE_DOMAIN }
-        : {}),
+      ...(env.COOKIE_DOMAIN ? { domain: env.COOKIE_DOMAIN } : {}),
     };
   }
 
