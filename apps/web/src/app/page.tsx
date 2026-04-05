@@ -110,7 +110,7 @@ export default function Home() {
               {copied ? "✓ Copied" : "Copy Command"}
             </button>
             <a
-              href="https://github.com/AliBaig-xD/blob/main/packages/mcp/README.md"
+              href="https://github.com/AliBaig-xD/walletlens/blob/main/packages/mcp/README.md"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#1e2a38] hover:bg-[#2a3a4a] text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
