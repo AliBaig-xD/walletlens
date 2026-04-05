@@ -1,0 +1,51 @@
+{
+  "name": "@walletlens/mcp",
+  "version": "1.0.0",
+  "description": "WalletLens MCP server for paid blockchain wallet intelligence tools.",
+  "main": "dist/index.js",
+  "bin": {
+    "walletlens-mcp": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "node --env-file=.env --experimental-strip-types src/index.ts",
+    "start": "node --env-file=.env dist/index.js",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mcp",
+    "wallet",
+    "blockchain",
+    "x402",
+    "walletlens"
+  ],
+  "author": "WalletLens",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^20.19.39",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "viem": "^2.47.10",
+    "x402-fetch": "^1.1.0",
+    "zod": "^3.25.76"
+  }
+}
