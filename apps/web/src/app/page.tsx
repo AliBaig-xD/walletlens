@@ -5,11 +5,20 @@ import { useRouter } from "next/navigation";
 import { type ActionID } from "@/types/pages";
 import { ACTIONS } from "@/lib/constants";
 
+const SETUP_COMMAND = "AGENT_PRIVATE_KEY=0x... npx -y @walletlens/mcp setup";
+
 export default function Home() {
   const router = useRouter();
   const [address, setAddress] = useState("");
   const [selected, setSelected] = useState<ActionID>("analyze");
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCommand = () => {
+    navigator.clipboard.writeText(SETUP_COMMAND);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleSubmit = () => {
     if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
@@ -78,7 +87,40 @@ export default function Home() {
         </div>
         {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
 
-        <p className="text-center text-xs text-gray-600 mt-8">
+        {/* Claude Desktop Section */}
+        <div className="mt-16 pt-12 border-t border-[#1e2a38]">
+          <h2 className="text-2xl font-bold text-center mb-4">
+            For <span className="text-[#00d4aa]">Claude Desktop</span>
+          </h2>
+          <p className="text-center text-gray-400 text-sm mb-6 max-w-md mx-auto">
+            One command to enable intelligent agent reasoning over wallet data. Claude can ask follow-up questions and combine insights in real-time.
+          </p>
+          
+          <div className="bg-[#0d1117] border border-[#1e2a38] rounded-xl p-4 mb-4">
+            <code className="text-[#00d4aa] font-mono text-sm break-all">
+              {SETUP_COMMAND}
+            </code>
+          </div>
+          
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={handleCopyCommand}
+              className="bg-[#00d4aa]/20 hover:bg-[#00d4aa]/30 text-[#00d4aa] px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+            >
+              {copied ? "✓ Copied" : "Copy Command"}
+            </button>
+            <a
+              href="https://github.com/AliBaig-xD/blob/main/packages/mcp/README.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#1e2a38] hover:bg-[#2a3a4a] text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+            >
+              Learn More →
+            </a>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-600 mt-12">
           Paid via USDC on Base · x402 protocol · No accounts needed for agents
         </p>
       </div>
