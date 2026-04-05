@@ -30,6 +30,15 @@
   ],
   "author": "WalletLens",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AliBaig-xD/walletlens.git",
+    "directory": "packages/mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/AliBaig-xD/walletlens/issues"
+  },
+  "homepage": "https://github.com/AliBaig-xD/walletlens/tree/main/packages/mcp#readme",
   "engines": {
     "node": ">=18"
   },
