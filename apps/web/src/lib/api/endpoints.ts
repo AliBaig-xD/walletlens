@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+import { env } from "../config/env";
+
+const API_BASE = env.NEXT_PUBLIC_API_BASE_URL;
 
 export const ENDPOINTS = {
   auth: {
